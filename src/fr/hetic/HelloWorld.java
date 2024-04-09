@@ -1,7 +1,7 @@
 package fr.hetic;
 
-class Hello World {
-    public static void(String[] args){
+class HelloWorld {
+    public static void main(String[] args) {
         System.out.println("Hello World");
     }
 }
