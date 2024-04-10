@@ -1,45 +1,68 @@
+import java.io.*;
 package fr.hetic;
 
 public class Calculateur {
     public static void main(String[] args) {
-        if (args.length != 3) {
-            System.out.println("Usage: java Calculateur <num1> <num2> <operation>");
+        if (args.length != 1) {
+            System.out.println("Usage: java Calculateur <chemin_dossier>");
             return;
         }
 
-        double num1 = 0;
-        double num2 = 0;
+        String dossier = args[0];
 
-        try {
-            num1 = Double.parseDouble(args[0]);
-            num2 = Double.parseDouble(args[1]);
-        } catch (NumberFormatException e) {
-            System.out.println("Les deux premiers arguments doivent être des nombres.");
+        File dossierFichiers = new File(dossier);
+        File[] fichiers = dossierFichiers.listFiles();
+
+        if (fichiers == null) {
+            System.out.println("Le dossier spécifié est invalide.");
             return;
         }
 
-        String operation = args[2];
+        for (File fichier : fichiers) {
+            if (fichier.isFile() && fichier.getName().endsWith(".op")) {
+                processFile(fichier);
+            }
+        }
+    }
 
-        switch (operation) {
-            case "add":
-                System.out.println("Résultat: " + (num1 + num2));
-                break;
-            case "sub":
-                System.out.println("Résultat: " + (num1 - num2));
-                break;
-            case "mul":
-                System.out.println("Résultat: " + (num1 * num2));
-                break;
-            case "div":
-                if (num2 != 0) {
-                    System.out.println("Résultat: " + (num1 / num2));
-                } else {
-                    System.out.println("Erreur: Division par zéro.");
+    private static void processFile(File fichier) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fichier))) {
+            String nomFichierRes = fichier.getAbsolutePath().replace(".op", ".res");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(nomFichierRes));
+
+            String ligne;
+            while ((ligne = reader.readLine()) != null) {
+                String[] elements = ligne.split(" ");
+                try {
+                    double num1 = Double.parseDouble(elements[0]);
+                    double num2 = Double.parseDouble(elements[1]);
+                    String operateur = elements[2];
+
+                    double resultat = calculerResultat(num1, num2, operateur);
+                    writer.write(String.valueOf(resultat));
+                    writer.newLine();
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                    writer.write("ERROR");
+                    writer.newLine();
                 }
-                break;
+            }
+
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static double calculerResultat(double num1, double num2, String operateur) {
+        switch (operateur) {
+            case "+":
+                return num1 + num2;
+            case "-":
+                return num1 - num2;
+            case "x":
+                return num1 * num2;
             default:
-                System.out.println("Opération non reconnue. Les opérations valides sont: add, sub, mul, div.");
-                break;
+                throw new UnsupportedOperationException("Opérateur non supporté : " + operateur);
         }
     }
 }
