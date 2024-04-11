@@ -1,5 +1,4 @@
 package fr.hetic.Implementation;
-
 import Interface.Operation;
 
 public class Addition implements Operation {
