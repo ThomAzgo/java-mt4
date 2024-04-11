@@ -1,3 +1,5 @@
+package fr.hetic;
+
 import java.io.*;
 package fr.hetic;
 
